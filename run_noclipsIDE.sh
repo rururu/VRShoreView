@@ -21,6 +21,6 @@ python3 -m webbrowser -t "http://localhost:${PORT}/chart" &
 
 python3 -m webbrowser -t "http://localhost:${PORT}/view3d" &
 
-#clips/clips -f clp/run.bat
+clips/clips -f clp/run.bat
 
 
