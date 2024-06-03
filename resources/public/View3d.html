@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	<title>Cockpit View</title>
+	<meta charset="utf-8">
+	<script src="Cesium/Cesium.js"></script>
+	<style>
+		@import url(Cesium/Widgets/widgets.css);
+		#cesiumContainer {
+			width: 100%;
+			height: 100%;
+			font-family: sans-serif;
+			background: #000;
+		}
+	</style>
+    <link rel="stylesheet" href="view3d.css" media="screen">
+  </head>
+  <body>
+	  <div id="navigationHelpButtonContainer"></div>
+	  <div id="cesiumContainer"></div>
+      <div class="backdrop" id="cam-menu">
+		<span><strong>Camera Mode</strong></span>
+        <div class="nowrap">
+          <input id="freeMode" name="source" type="radio" checked/>
+          <label for="freeMode">Free</label>
+        </div>
+        <div class="nowrap">
+          <input id="droneMode" name="source" type="radio"/>
+          <label for="droneMode">Onboard</label>
+        </div>
+        <div id="boats-dls"></div>
+      </div>
+      <div class="backdrop" id="mod-menu">
+		<span><strong>Model Adjustment</strong></span>
+		<div id="onb-name"></div>
+        <div class="nowrap">
+			<input type="text" id="mod-type" name="mod-type">
+			<label for="mod-type">model</label>
+        </div>
+        <div class="nowrap">
+			<input type="text" id="mod-scale" name="mod-scale">
+			<label for="mod-scale">scale</label>
+        </div>
+        <div class="nowrap">
+			<input type="text" id="mod-draft" name="mod-draft">
+			<label for="mod-draft">draft</label>
+        </div>
+		<div id="models-dls">new model</div>
+        <div id="mod-adjust"></div>
+      </div>
+    </div>
+    <script type="text/javascript" src="CesiumGUISupport.js"></script>
+    <script type="module">
+		Cesium.Ion.defaultAccessToken =  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwN2EzYzEyNS1mMmNlLTRlYjEtYjRiMS04OTliNjhkZjI4NzQiLCJpZCI6MzY0MCwic2NvcGVzIjpbImFzciIsImdjIl0sImlhdCI6MTUzODQxODg5OH0.E2p7oe8fLJOtyawv0uT9zBZw4oyKZ6Vt3CZsE0FKeJw';
+
+		const viewer = new Cesium.Viewer("cesiumContainer", {
+		  imageryProvider: await Cesium.createWorldImageryAsync(),
+		  terrainProvider: await Cesium.createWorldTerrainAsync(),
+		  scene3DOnly: true,
+		  infoBox: false,
+		  selectionIndicator: false,
+		  //shadows: true,
+		  animation: false,
+		  shouldAnimate: true,
+		  timeline: false
+		});
+		viewer.scene.globe.enableLighting = true;
+
+		var onboard = null;
+		var camView = 0;
+		var camPitch = 0;
+		var camElevation = 0;
+		var boat_names = ['russor']
+		var model_names = ['Bermuda']
+		var boat_ops = mkMenuOpsGoonb(boat_names)
+		var model_ops = mkMenuOpsSetmod(model_names)
+		var onb_model = []
+		var mod_type = "Bermuda";
+		var cmd_old = "";
+		var draft = 0;
+		var scale = 0;
+
+		//////////////////////////////////////////////////////////////////////////
+		// Data Sources
+		//////////////////////////////////////////////////////////////////////////
+      
+		const czml_ds = new Cesium.CzmlDataSource();
+		const czml_es = new EventSource("http://localhost:8448/view3d-event");
+		viewer.dataSources.add(czml_ds);
+		czml_es.addEventListener("czml", function(e) {
+		var data = e.data;
+		console.log(data);
+		czml_ds.process(JSON.parse(data));
+		}, false);
+
+		const json_ds = new Cesium.GeoJsonDataSource();
+		const json_es = new EventSource("http://localhost:8448/json-event");
+		viewer.dataSources.add(json_ds);
+		json_es.addEventListener("json", function(e) {
+		 var data = e.data;
+		 let control = JSON.parse(data);
+		 let cmd = control[0];
+		 if(cmd != cmd_old) {
+			if(cmd.boats != undefined && cmd.boats.length != boat_names.length) {
+				boat_names = cmd.boats;
+				boat_ops = mkMenuOpsGoonb(cmd.boats);
+				updateToolbarMenu(boat_ops, "boats-dls", "boats");
+			}
+			if(cmd.models != undefined && cmd.models.length != model_names.length) {
+				model_names = cmd.models;
+				model_ops = mkMenuOpsSetmod(cmd.models);
+				updateToolbarMenu(model_ops, "models-dls", "models");
+			}
+			console.log("cmd.onb_model[0] "+cmd.onb_model[0]);
+			if(cmd.onb_model != undefined && cmd.onb_model[0] != onb_model[0]) {
+				onb_model = cmd.onb_model;
+				document.getElementById('onb-name').innerHTML = onb_model[0];
+				document.getElementById('mod-type').value = onb_model[1];
+				document.getElementById('mod-scale').value = onb_model[3];
+				document.getElementById('mod-draft').value = onb_model[4];
+				go_onboard(czml_ds, onb_model[0]);
+			}
+			cmd_old = cmd;
+		 }
+		}, false);
+       
+		//////////////////////////////////////////////////////////////////////////
+		// Setup Camera Modes
+		//////////////////////////////////////////////////////////////////////////
+
+		var freeModeElement = document.getElementById('freeMode');
+		var droneModeElement = document.getElementById('droneMode');
+
+		// Create a follow camera by tracking the drone entity
+		function setViewMode() {
+		  if (droneModeElement.checked) {
+			  console.log("ONBOARD");
+			  viewer.trackedEntity = onboard;
+		  } else {
+			  console.log("FREE");
+			  viewer.trackedEntity = undefined;
+		  }
+		}
+
+		freeModeElement.addEventListener('change', setViewMode);
+		droneModeElement.addEventListener('change', setViewMode);
+
+		viewer.trackedEntityChanged.addEventListener(function() {
+		  if (viewer.trackedEntity === onboard) {
+			  freeModeElement.checked = false;
+			  droneModeElement.checked = true;
+		  }
+		});
+      
+		function sendCommand (cmd, param) {
+			let url = new URL('http://localhost:8448/command');
+			url.searchParams.set(cmd, param);
+			let xhr = new XMLHttpRequest();
+			xhr.open('GET', url);
+			xhr.send();
+		}
+      
+		function go_onboard(ds, name) {
+			//console.log("ONBOARD "+id);
+			onboard = ds.entities.getById(name);
+			var now = null;
+			var pos = null;
+			now = Cesium.JulianDate.now(now);
+			pos = onboard.position.getValue(now, pos);
+			viewer.camera.flyTo({
+				destination: pos,
+				complete: function(){
+					droneModeElement.checked = false;
+					setViewMode()
+					droneModeElement.checked = true;
+					setViewMode()
+				}
+			});
+		}
+		
+		function set_model(name) {
+			document.getElementById("mod-type").value = name;
+		}
+
+		function mkMenuOpsGoonb(names) {
+			let ops = [];
+			names.forEach(function (name) {
+					ops.push(
+						{
+							text: name,
+							onselect: function () {
+								if(viewer.trackedEntity == undefined) {
+									sendCommand ('onboard', "\""+name+"\"");
+								} else {
+										alert("Do Free before!")
+								}
+							}
+						}
+					);
+				}
+			)
+			return ops;
+		}
+
+		function mkMenuOpsSetmod(names) {
+			let ops = [];
+			names.forEach(function (name) {
+					ops.push(
+						{
+							text: name,
+							onselect: function () {
+								set_model(name);
+							}
+						}
+					);
+				}
+			)
+			return ops;
+		}
+		
+		function model_adjust() {
+			mod_type = document.getElementById("mod-type").value;
+			draft = document.getElementById("mod-draft").value;
+			scale = document.getElementById("mod-scale").value;
+			sendCommand ('update-model', "\""+mod_type+"\" "+scale+" "+draft);
+		}	
+	
+		addToolbarMenu(boat_ops, "boats-dls", "boats");
+		addToolbarMenu(model_ops, "models-dls", "models");
+		//let item = document.getElementById("boats");
+		addToolbarButton("Update Model", model_adjust, "mod-adjust", "adjust")
+    </script>
+  </body>
+</html>
