@@ -11,41 +11,73 @@
 	(run))
 
 (defrule Main-loop
+	(declare (salience +1))
 	(clock ?t)
 	(test (= (mod ?t ?*pause*) 0))
     =>
-    ;;(println "Main-loop")
+    (println "Main-loop")
     (bind ?*gmt* (gm-time))
     (bind ?*race* (read-file "../NMEA_CACHE/RACE.txt"))
     (if (neq ?*race* EOF)
 		then
 		(load-facts (str-cat "../NMEA_CACHE/" ?*race* "/GPRMC.txt"))
-		(load-facts (str-cat "../NMEA_CACHE/" ?*race* "/boat_models.fct"))))
+		(println "BM "(load-facts (str-cat "../NMEA_CACHE/" ?*race* "/boat_models.fct")))))
 		
-;;;;;;;;;;;;;;;;;;;;;;;; DOES INFORMATION NEW ;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defrule Set-GEN-MODEL-1
+	(GEN-MODEL ?)
+	(not (NEW-MODEL ?))
+	=>
+	(assert (Information phase)))
+	
+(defrule Set-GEN-MODEL-2
+	?n <- (NEW-MODEL ?nm)
+	(not (GEN-MODEL ?))
+	=>
+	(retract ?n)
+	(if (eq ?nm "")
+		then (assert (GEN-MODEL "Bermuda"))
+		else (assert (GEN-MODEL ?nm)))
+	(assert (Information phase)))
+	
+(defrule Set-GEN-GEN-MODEL-3
+	?g <- (GEN-MODEL ?gm)
+	?n <- (NEW-MODEL ?nm)
+	=>
+	(if (eq ?nm "")
+		then (retract ?n)
+		else
+		(retract ?g ?n)
+		(assert (GEN-MODEL ?nm)))
+	(assert (Information phase)))
+		
+;;;;;;;;;;;;;;;;;;;;;;;; INFORMATION PHASE ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defrule Check-new-timestamp
+(defrule Old-timestamp
+	?p <- (Information phase)
     ?ts <- (timestamp ?time1)
     ?mbi <- (MyBoatInfo (timestamp ?time2))
+    (test (eq ?time1 ?time2))
     =>
-    ;;(println "Check-new-timestamp")
-    (if (eq ?time1 ?time2)
-		then
-		(retract ?mbi)
-		(move-boats ?*pause*)
-		(assert (Visualisation phase))
-		else
-		(println "New Info Timestamp " ?time2)
-		(retract ?ts)
-		(do-for-all-facts ((?b Boat)) TRUE
-			(retract ?b))
-		(do-for-all-facts ((?bm BoatModel)) TRUE
-			(retract ?bm))
-		(println "Fleet " (load-facts (str-cat "../NMEA_CACHE/" ?*race* "/AIVDM.txt")))))
+	(retract ?mbi)
+	(move-boats ?*pause*)
+	(println "Visualisation phase 1")
+	(retract ?p)
+	(assert (Visualisation phase)))
 
-;;;;;;;;;;;;;;;; LOADING AND PREPROCESSING INFORMATION ;;;;;;;;;;;;;;;;;
-
+(defrule New-timestamp
+	(Information phase)
+    ?ts <- (timestamp ?time1)
+    ?mbi <- (MyBoatInfo (timestamp ?time2))
+    (test (neq ?time1 ?time2))
+    =>
+	(println "New Info Timestamp " ?time2)
+	(retract ?ts)
+	(do-for-all-facts ((?b Boat)) TRUE
+		(retract ?b))
+	(println "Fleet " (load-facts (str-cat "../NMEA_CACHE/" ?*race* "/AIVDM.txt"))))
+	
 (defrule Assert-Boat
+	(Information phase)
 	?bi <- (BoatInfo (motion $?motion) (mmsi ?mmsi))
 	?bn <- (boat-name ?name ?mmsi)
 	=>
@@ -54,6 +86,7 @@
     	
 (defrule Assert-my-Boat
 	(declare (salience -1))
+	?p <- (Information phase)
     ?mbi <- (MyBoatInfo (timestamp ?time2) (motion $?mot))
 	(MYBOAT ?n)
 	(not (Boat (name ?n)))
@@ -62,6 +95,8 @@
 	(assert (timestamp ?time2))
 	(assert (Boat (name ?n) (motion $?mot) (onboard TRUE)))
 	(println "My boat " ?n " motion " $?mot)
+	(println "Visualisation phase 2")
+	(retract ?p)
 	(assert (Visualisation phase)))
     	
 ;;;;;;;;;;;;;;;;;;;;;;;; VISUALISATION PHASE ;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -135,30 +170,34 @@
 	(declare (salience +1))
     (Visualisation phase)
 	=>
-	(save-facts (str-cat "../NMEA_CACHE/" ?*race* "/boat_models.fct") local BoatModel))
+	(println "Save Boat Models")
+	(save-facts (str-cat "../NMEA_CACHE/" ?*race* "/boat_models.fct") local BoatModel GEN-MODEL)
+	(do-for-all-facts ((?bm BoatModel)) TRUE
+		(retract ?bm))
+	(do-for-all-facts ((?gm GEN-MODEL)) TRUE
+		(retract ?gm)))
 
 (defrule Write-chart-file
     (Visualisation phase)
     =>
-    ;;(println "Write-chart-file")
+    (println "Write-chart-file")
     (write-file "../resources/public/chart/fleet.geojson" (create-fleet-geojson)))
 
 (defrule Write-view3d-file
     (Visualisation phase)
     =>
-    ;;(println "Write-view3d-file")
+    (println "Write-view3d-file")
     (write-file "../resources/public/view3d/czml.json" (create-fleet-czml)))
     
 (defrule Continue-main-loop
     (declare (salience -1))
     ?p <- (Visualisation phase)
     =>
-    ;;(println "Continue-main-loop")
+    (println "Continue-main-loop")
 	(write-file "../resources/public/view3d/view_control.json"
 		(view-control-info))
     (retract ?p))
-
-    
+   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     
 

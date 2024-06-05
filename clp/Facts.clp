@@ -1,6 +1,6 @@
 
 (deffacts Start-facts
 	(MYBOAT "russor")
-	(GEN-MODEL "Bermuda")
+	(NEW-MODEL "")
 	(clock 0)
     (timestamp ""))

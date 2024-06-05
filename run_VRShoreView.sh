@@ -21,5 +21,5 @@ python3 -m webbrowser -t "http://localhost:${PORT}/chart" &
 
 python3 -m webbrowser -t "http://localhost:${PORT}/view3d" &
 
-run_IDE.sh
+./run_IDE.sh
 

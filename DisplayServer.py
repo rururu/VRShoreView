@@ -102,12 +102,15 @@ def run(server_class=HTTPServer, handler_class=HttpGetHandler, port=8448):
 
 port = sys.argv[1]
 myboat = sys.argv[2]
-model = sys.argv[3]
+if len(sys.argv) > 3:
+    model = sys.argv[3]
+else:
+    model = ''
 
 deffacts = """
 (deffacts Start-facts
 	(MYBOAT "$1")
-	(GEN-MODEL "$2")
+	(NEW-MODEL "$2")
 	(clock 0)
     (timestamp ""))
 """
