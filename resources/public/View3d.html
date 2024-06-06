@@ -31,7 +31,7 @@
         <div id="boats-dls"></div>
       </div>
       <div class="backdrop" id="mod-menu">
-		<span><strong>Model Adjustment</strong></span>
+		<span><strong>Onboard</strong></span>
 		<div id="onb-name"></div>
         <div class="nowrap">
 			<input type="text" id="mod-type" name="mod-type">
@@ -70,11 +70,12 @@
 		var camView = 0;
 		var camPitch = 0;
 		var camElevation = 0;
-		var boat_names = ['russor']
-		var model_names = ['Bermuda']
-		var boat_ops = mkMenuOpsGoonb(boat_names)
-		var model_ops = mkMenuOpsSetmod(model_names)
-		var onb_model = []
+		var boat_names = ['russor'];
+		var model_names = ['Bermuda'];
+		var onb_name = 'russor';
+		var boat_ops = mkMenuOpsGoonb(boat_names);
+		var model_ops = mkMenuOpsSetmod(model_names);
+		var onb_model = [];
 		var mod_type = "Bermuda";
 		var cmd_old = "";
 		var draft = 0;
@@ -89,7 +90,7 @@
 		viewer.dataSources.add(czml_ds);
 		czml_es.addEventListener("czml", function(e) {
 		var data = e.data;
-		console.log(data);
+		//console.log(data);
 		czml_ds.process(JSON.parse(data));
 		}, false);
 
@@ -134,10 +135,13 @@
 		// Create a follow camera by tracking the drone entity
 		function setViewMode() {
 		  if (droneModeElement.checked) {
-			  console.log("ONBOARD");
-			  viewer.trackedEntity = onboard;
+			  if (onb_name != undefined) {
+				console.log("ONBOARD");
+				viewer.trackedEntity = onboard;
+				}
 		  } else {
 			  console.log("FREE");
+			  onb_name = undefined;
 			  viewer.trackedEntity = undefined;
 		  }
 		}
@@ -161,8 +165,8 @@
 		}
       
 		function go_onboard(ds, name) {
-			//console.log("ONBOARD "+id);
 			onboard = ds.entities.getById(name);
+			onb_name = name;
 			var now = null;
 			var pos = null;
 			now = Cesium.JulianDate.now(now);
@@ -170,51 +174,38 @@
 			viewer.camera.flyTo({
 				destination: pos,
 				complete: function(){
-					droneModeElement.checked = false;
-					setViewMode()
-					droneModeElement.checked = true;
-					setViewMode()
+					viewer.trackedEntity = onboard;
 				}
 			});
 		}
 		
-		function set_model(name) {
-			document.getElementById("mod-type").value = name;
-		}
-
 		function mkMenuOpsGoonb(names) {
 			let ops = [];
 			names.forEach(function (name) {
-					ops.push(
-						{
-							text: name,
-							onselect: function () {
-								if(viewer.trackedEntity == undefined) {
-									sendCommand ('onboard', "\""+name+"\"");
-								} else {
-										alert("Do Free before!")
-								}
-							}
+				ops.push({
+					text: name,
+					onselect: function () {
+						if (freeModeElement.checked) {
+							sendCommand ('onboard', "\""+name+"\"");
+						} else {
+							alert("Do Free first!");
 						}
-					);
-				}
-			)
+					}
+				});
+			});
 			return ops;
-		}
-
+		};
+			
 		function mkMenuOpsSetmod(names) {
 			let ops = [];
 			names.forEach(function (name) {
-					ops.push(
-						{
-							text: name,
-							onselect: function () {
-								set_model(name);
+				ops.push({
+					text: name,
+						onselect: function () {
+							document.getElementById("mod-type").value = name;
 							}
-						}
-					);
-				}
-			)
+						});
+					});
 			return ops;
 		}
 		
