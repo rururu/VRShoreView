@@ -15,6 +15,6 @@ start /b python -m webbrowser -t "http://localhost:%PORT%/chart"
 
 start /b python -m webbrowser -t "http://localhost:%PORT%/view3d"
 
-clips\CLIPSDOS.exe -f clp/run.bat
+clips\CLIPSIDE.exe
 
 
