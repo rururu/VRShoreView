@@ -18,6 +18,7 @@
   (modify ?b1 (onboard TRUE))
   (modify ?b2 (onboard FALSE))
   (clear-file "../resources/public/view3d/command.fct")
+  (println "Retract command")
   (retract ?cmd))
   
 (defrule Update-model-cmd

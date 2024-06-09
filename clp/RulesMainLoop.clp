@@ -15,13 +15,13 @@
 	(clock ?t)
 	(test (= (mod ?t ?*pause*) 0))
     =>
-    (println "Main-loop")
+    ;;(println "Main-loop")
     (bind ?*gmt* (gm-time))
     (bind ?*race* (read-file "../NMEA_CACHE/RACE.txt"))
     (if (neq ?*race* EOF)
 		then
 		(load-facts (str-cat "../NMEA_CACHE/" ?*race* "/GPRMC.txt"))
-		(println "BM "(load-facts (str-cat "../NMEA_CACHE/" ?*race* "/boat_models.fct")))))
+		(load-facts (str-cat "../NMEA_CACHE/" ?*race* "/boat_models.fct"))))
 		
 (defrule Set-GEN-MODEL-1
 	(GEN-MODEL ?)
@@ -170,7 +170,7 @@
 	(declare (salience +1))
     (Visualisation phase)
 	=>
-	(println "Save Boat Models")
+	;;(println "Save Boat Models")
 	(save-facts (str-cat "../NMEA_CACHE/" ?*race* "/boat_models.fct") local BoatModel GEN-MODEL)
 	(do-for-all-facts ((?bm BoatModel)) TRUE
 		(retract ?bm))
@@ -180,20 +180,20 @@
 (defrule Write-chart-file
     (Visualisation phase)
     =>
-    (println "Write-chart-file")
+    ;;(println "Write-chart-file")
     (write-file "../resources/public/chart/fleet.geojson" (create-fleet-geojson)))
 
 (defrule Write-view3d-file
     (Visualisation phase)
     =>
-    (println "Write-view3d-file")
+    ;;(println "Write-view3d-file")
     (write-file "../resources/public/view3d/czml.json" (create-fleet-czml)))
     
 (defrule Continue-main-loop
     (declare (salience -1))
     ?p <- (Visualisation phase)
     =>
-    (println "Continue-main-loop")
+    ;;(println "Continue-main-loop")
 	(write-file "../resources/public/view3d/view_control.json"
 		(view-control-info))
     (retract ?p))

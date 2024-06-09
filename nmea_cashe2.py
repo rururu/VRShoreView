@@ -59,6 +59,7 @@ def cashe_message(race, message):
             print ("Failed to create directory %s" % race)
         else:
             print ("The directory %s was successfully created" % race)
+            save_file(race + "/" + "boat_models.fct", "")
 	
     if message.find(b"AIVDM") != -1 :
         if getFlag(race) == "0":

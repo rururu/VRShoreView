@@ -11,7 +11,9 @@ def aivdm_parse(msg):
                       "(mmsi "+str(m.mmsi)+"))\r\n"
         return b.encode('utf-8')
     elif m.msg_type == 5:
-        n = "(boat-name \""+str(m.shipname)+"\" "+str(m.mmsi)+")\r\n"
+        shipname = m.shipname
+        shipname = shipname.replace("\"", "DQ")
+        n = "(boat-name \""+str(shipname)+"\" "+str(m.mmsi)+")\r\n"
         return n.encode('utf-8')
 
 def gprmc_parse(msg):
