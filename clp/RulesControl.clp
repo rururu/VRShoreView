@@ -8,18 +8,17 @@
 	(test (= (mod ?t 2) 0))
 	=>
 	(load-facts "../resources/public/view3d/command.fct"))
-	
+	 
 (defrule Go-onboard-cmd
-  ?cmd <- (Command onboard ?n1)
-  ?b1 <- (Boat (name ?n1) (onboard FALSE))
-  ?b2 <- (Boat (name ?n2)(onboard TRUE))
-  =>
-  (println "Command: Go onboard " ?n1)
-  (modify ?b1 (onboard TRUE))
-  (modify ?b2 (onboard FALSE))
-  (clear-file "../resources/public/view3d/command.fct")
-  (println "Retract command")
-  (retract ?cmd))
+	?cmd <- (Command onboard ?n1)
+	?b1 <- (Boat (name ?n1) (onboard FALSE))
+	?b2 <- (Boat (name ?n2)(onboard TRUE))
+	=>
+	(println "Command: Go onboard " ?n1)
+	(retract ?cmd)
+	(modify ?b1 (onboard TRUE))
+	(modify ?b2 (onboard FALSE))
+	(clear-file "../resources/public/view3d/command.fct"))
   
 (defrule Update-model-cmd
 	?cmd <- (Command update-model ?type ?scale ?draft)

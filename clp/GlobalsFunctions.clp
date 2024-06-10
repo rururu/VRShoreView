@@ -11,20 +11,27 @@
    (while (< (time) (+ ?start ?delay)) do))
 
 (deffunction read-file (?path)
-    (open ?path rr "r")
-    (bind ?r (read rr))
-    (close rr)
-    ?r)
-
-(deffunction clear-file (?path)
-    (open ?path rc "w")
-    (printout rc "")
-    (close rc))
+    (if (open ?path rr "r")
+     then
+      (bind ?r (read rr))
+      (close rr)
+      (return ?r)
+     else
+      (println "read-file " ?path " error!")
+      (return FALSE)))
 
 (deffunction write-file (?path ?txt)
-    (open ?path rw "w")
-    (printout rw ?txt)
-    (close rw))
+    (if (open ?path rw "w")
+     then
+      (printout rw ?txt)
+      (close rw)
+      (return TRUE)
+     else
+      (println "write-file " ?path " error!")
+      (return FALSE)))
+      
+(deffunction clear-file (?path)
+    (write-file ?path ""))
 
 (deffunction append-file (?path ?txt)
     (open ?path ra "a")
@@ -166,10 +173,13 @@
 (deffunction view-control-info ()
 	;; boats
 	(bind ?bns (create$))
+	(bind ?onb "")
 	(do-for-all-facts ((?b Boat)) TRUE
+		(if ?b:onboard
+		 then (bind ?onb ?b:name))
 		(bind ?bns (create$ ?bns ?b:name)))	
 	(bind ?bns (sort string> ?bns))
-	(bind ?bs "[\"\",")
+	(bind ?bs (str-cat "[\"" ?onb "\","))
 	(foreach ?b ?bns
 		(bind ?bs (str-cat ?bs "\"" ?b "\",")))
 	(bind ?bs (str-cat (sub-string 1 (- (str-length ?bs) 1) ?bs) "]"))

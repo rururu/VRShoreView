@@ -60,7 +60,7 @@
     =>
 	(retract ?mbi)
 	(move-boats ?*pause*)
-	(println "Visualisation phase 1")
+	;;(println "Visualisation phase 1")
 	(retract ?p)
 	(assert (Visualisation phase)))
 
@@ -95,7 +95,7 @@
 	(assert (timestamp ?time2))
 	(assert (Boat (name ?n) (motion $?mot) (onboard TRUE)))
 	(println "My boat " ?n " motion " $?mot)
-	(println "Visualisation phase 2")
+	;;(println "Visualisation phase 2")
 	(retract ?p)
 	(assert (Visualisation phase)))
     	
