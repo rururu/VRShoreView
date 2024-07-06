@@ -40,6 +40,7 @@ $ VRShoreView.bat russor Bermuda        # Windows
 2. Replace "Bermuda" with your choice of boat's model type. Full list of model types
  is in a file "<..>/VRShoreView/clp/FactsModels.clp". You can add your models in this file approprietly.
 
+_More detailed version: [https://github.com/rururu/sail-pro](https://github.com/rururu/sail-pro)_
 
 Copyright © 2024 Ruslan Sorokin
 
