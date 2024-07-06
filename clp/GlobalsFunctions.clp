@@ -99,8 +99,9 @@
   (str-cat "{\"gltf\":\"" ?gltf "\""
             ",\"scale\":" ?scale
             ?extra
-            "}"))
-            ;;",\"heightReference\":\"RELATIVE_TO_GROUND\"}"))
+            ;;"}"))
+            ;;",\"heightReference\":\"CLAMP_TO_GROUND\"}"))
+            ",\"heightReference\":\"RELATIVE_TO_GROUND\"}"))
             
 (deffunction boat-view3d-altitude (?mod)
   (bind ?draft (nth$ 4 ?mod))
