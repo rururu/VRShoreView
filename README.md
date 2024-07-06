@@ -23,7 +23,7 @@ You need to be installed on your machine:
 
 ## Installation and usage
 
-Download sail-pro Github using a button "Code" on this page and unzip somewhere. Then:
+Download VRShoreView project from the Github using a button "Code" on this page and unzip somewhere. Then:
 
 1. Open "Virual Regatta" page in a browser.
 2. Activate "VR Dashboard" plugin. 
