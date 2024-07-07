@@ -20,18 +20,16 @@
 	(modify ?b2 (onboard FALSE))
 	(clear-file "../resources/public/view3d/command.fct"))
   
-(defrule Update-model-cmd
-	?cmd <- (Command update-model ?type ?scale ?draft)
-	(Model (type ?type) (gltf ?gltf)(extra ?extra))
-	?bt <- (Boat (name ?bn) (onboard TRUE))
-	?bm <- (BoatModel (boat ?bn))
-	=>
-	(println "Command: Update model for " ?bn ": " ?type " " ?scale " " ?draft)
-	(modify ?bm (model ?type ?gltf ?scale ?draft ?extra))
-	(modify ?bt (model ?type ?gltf ?scale ?draft ?extra))
-	(save-facts (str-cat "../NMEA_CACHE/" ?*race* "/boat_models.fct") local BoatModel)
-	(clear-file "../resources/public/view3d/command.fct")
-	(retract ?cmd))
+;(defrule Update-model-cmd
+	;?cmd <- (Command update-model ?type ?scale ?draft)
+	;?m <- (Model (type ?type))
+	;?b <- (Boat (name ?bn) (onboard TRUE))
+	;=>
+	;(println "Command: Update model for " ?bn ": " ?type " " ?scale " " ?draft)
+	;(modify ?b (model ?m))
+	;(save-facts (str-cat "../NMEA_CACHE/" ?*race* "/boat_models.fct") local BoatModel)
+	;(clear-file "../resources/public/view3d/command.fct")
+	;(retract ?cmd))
 
   
 

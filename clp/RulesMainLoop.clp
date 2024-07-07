@@ -15,7 +15,7 @@
 	(clock ?t)
 	(test (= (mod ?t ?*pause*) 0))
     =>
-    ;;(println "Main-loop")
+    (println "clock " ?t)
     (bind ?*gmt* (gm-time))
     (bind ?*race* (read-file "../NMEA_CACHE/RACE.txt"))
     (if (neq ?*race* EOF)
@@ -101,70 +101,72 @@
     	
 ;;;;;;;;;;;;;;;;;;;;;;;; VISUALISATION PHASE ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defrule Set-boat-model
+(defrule Set-stored-boat-model
 	(declare (salience +4))
     (Visualisation phase)
-	(BoatModel (boat ?boat) (model $?m1))
-	?b <- (Boat (name ?boat) (model $?m2&:(neq $?m1 $?m2)))
+	(BoatModel (boat ?boat) (model ?model))
+	?m <- (Model (type ?model))
+	?b <- (Boat (name ?boat &:(neq ?boat "")) 
+			(model ?bm &:(neq ?bm ?m)))
 	=>
-	(modify ?b (model $?m1)))
+	(modify ?b (model ?m)))
 
 (defrule Assert-specific-BoatModel
 	(declare (salience +3))
     (Visualisation phase)
-    (Model (type ?type)(boat ?boat)(gltf ?g)(scale ?s)(draft ?d)(extra ?e))
-    ?b <- (Boat (name ?boat))
+    (Model (boat ?boat)(type ?model))
+    (Boat (name ?boat &:(neq ?boat "")))
     (not (BoatModel (boat ?boat)))
     =>
-    (assert (BoatModel (boat ?boat) (model (create$ ?type ?g ?s ?d ?e)))))	
+    (assert (BoatModel (boat ?boat)(model ?model))))
 
 (defrule Assert-general-BoatModel
 	(declare (salience +2))
     (Visualisation phase)
     (GEN-MODEL ?gen-type)
-    (Model (type ?gen-type)(gltf ?g)(scale ?s)(draft ?d)(extra ?e))
-    ?b <- (Boat (name ?boat))
+    (Model (type ?gen-type))
+    (Boat (name ?boat &:(neq ?boat "")))
     (not (BoatModel (boat ?boat)))
     =>
-    (assert (BoatModel (boat ?boat) (model (create$ ?gen-type ?g ?s ?d ?e)))))	
+    (assert (BoatModel (boat ?boat) (model ?gen-type))))	
 
 (defrule Assert-Medieval-Mix-BoatModel
 	(declare (salience +2))
     (Visualisation phase)
     (GEN-MODEL "Medieval_Mix")
-    (Model (type "Santa_Maria")(gltf ?gm)(scale ?sm)(draft ?dm)(extra ?em))
-    (Model (type "Santa_Isadora")(gltf ?gi)(scale ?si)(draft ?di)(extra ?ei))
-    ?b <- (Boat (name ?boat))
+    (Model (type "Santa_Maria"))
+    (Model (type "Santa_Isadora"))
+    ?b <- (Boat (name ?boat &:(neq ?boat "")))
     (not (BoatModel (boat ?boat)))
     =>
     (if (> (random 0 1) 0)
-		then (assert (BoatModel (boat ?boat) (model (create$ "Santa_Maria" ?gm ?sm ?dm ?em))))
-		else (assert (BoatModel (boat ?boat) (model (create$ "Santa_Isadora" ?gi ?si ?di ?ei))))))
+		then (assert (BoatModel (boat ?boat) (model "Santa_Maria")))
+		else (assert (BoatModel (boat ?boat) (model "Santa_Isadora")))))
 
 (defrule Assert-Trimaran-Mix-BoatModel
 	(declare (salience +2))
     (Visualisation phase)
     (GEN-MODEL "Trimaran_Mix")
-    (Model (type "Black_Trimaran")(gltf ?gb)(scale ?sb)(draft ?db)(extra ?eb))
-    (Model (type "Blue_Trimaran")(gltf ?gu)(scale ?su)(draft ?du)(extra ?eu))
-    (Model (type "Cyan_Trimaran")(gltf ?gc)(scale ?sc)(draft ?dc)(extra ?ec))
-    (Model (type "Green_Trimaran")(gltf ?gg)(scale ?sg)(draft ?dg)(extra ?eg))
-    (Model (type "Red_Trimaran")(gltf ?gr)(scale ?sr)(draft ?dr)(extra ?er))
-    (Model (type "Magenta_Trimaran")(gltf ?gm)(scale ?sm)(draft ?dm)(extra ?em))
-    (Model (type "Yellow_Trimaran")(gltf ?gy)(scale ?sy)(draft ?dy)(extra ?ey))
-    (Model (type "White_Trimaran")(gltf ?gw)(scale ?sw)(draft ?dw)(extra ?ew))
-    ?b <- (Boat (name ?boat))
+    (Model (type "Black_Trimaran"))
+    (Model (type "Blue_Trimaran"))
+    (Model (type "Cyan_Trimaran"))
+    (Model (type "Green_Trimaran"))
+    (Model (type "Red_Trimaran"))
+    (Model (type "Magenta_Trimaran"))
+    (Model (type "Yellow_Trimaran"))
+    (Model (type "White_Trimaran"))
+    ?b <- (Boat (name ?boat &:(neq ?boat "")))
     (not (BoatModel (boat ?boat)))
     =>
     (switch (random 1 8)
-		(case 1 then (assert (BoatModel (boat ?boat) (model (create$ "Black_Trimaran" ?gb ?sb ?db ?eb)))))
-		(case 2 then (assert (BoatModel (boat ?boat) (model (create$ "Blue_Trimaran" ?gu ?su ?du ?eu)))))
-		(case 3 then (assert (BoatModel (boat ?boat) (model (create$ "Cyan_Trimaran" ?gc ?sc ?dc ?ec)))))
-		(case 4 then (assert (BoatModel (boat ?boat) (model (create$ "Green_Trimaran" ?gg ?sg ?dg ?eg)))))
-		(case 5 then (assert (BoatModel (boat ?boat) (model (create$ "Red_Trimaran" ?gr ?sr ?dr ?er)))))
-		(case 6 then (assert (BoatModel (boat ?boat) (model (create$ "Magenta_Trimaran" ?gm ?sm ?dm ?em)))))
-		(case 7 then (assert (BoatModel (boat ?boat) (model (create$ "Yellow_Trimaran" ?gy ?sy ?dy ?ey)))))
-		(default (assert (BoatModel (boat ?boat) (model (create$ "White_Trimaran" ?gw ?sw ?dw ?ew)))))))
+		(case 1 then (assert (BoatModel (boat ?boat) (model "Black_Trimaran"))))
+		(case 2 then (assert (BoatModel (boat ?boat) (model "Blue_Trimaran"))))
+		(case 3 then (assert (BoatModel (boat ?boat) (model "Cyan_Trimaran"))))
+		(case 4 then (assert (BoatModel (boat ?boat) (model "Green_Trimaran"))))
+		(case 5 then (assert (BoatModel (boat ?boat) (model "Red_Trimaran"))))
+		(case 6 then (assert (BoatModel (boat ?boat) (model "Magenta_Trimaran"))))
+		(case 7 then (assert (BoatModel (boat ?boat) (model "Yellow_Trimaran"))))
+		(case 8 then (assert (BoatModel (boat ?boat) (model "White_Trimaran"))))))
 
 (defrule Save-BoatModels
 	(declare (salience +1))

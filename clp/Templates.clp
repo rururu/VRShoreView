@@ -6,7 +6,7 @@
     (multislot motion (type FLOAT)) 
     (slot mmsi (type INTEGER))
 	(slot type (type STRING))
-	(multislot model)
+	(slot model (type FACT-ADDRESS))
     (slot onboard (type SYMBOL)(default FALSE)))
     
 (deftemplate BoatInfo
@@ -27,10 +27,9 @@
 	(slot scale (type FLOAT))
 	(slot draft (type INTEGER))
 	(slot extra (type STRING)(default "")))
-
+	
 (deftemplate BoatModel
-    (slot boat (type STRING)(default ""))
-	(multislot model))
-
+	(slot boat (type STRING))
+	(slot model (type STRING)))
 
 

@@ -1,7 +1,7 @@
 
 (deffacts Model-facts
 
-	(Model (type "Santa_Maria")(gltf "models/santa_maria/scene.gltf")(scale 0.2)(draft 34))
+	(Model (type "Santa_Maria")(gltf "models/santa_maria/scene.gltf")(scale 0.2)(draft 200))
 	(Model (type "Santa_Isadora")(gltf "models/santa_isadora/scene.gltf")(scale 15.0)(draft 5))
 	(Model (type "Bermuda")(gltf "models/sailboat/1368Sailboat.gltf")(scale 2.0)(draft 60))
 	(Model (type "Frigate")(boat "FRIGATE")(gltf "models/frigate/scene.gltf")(scale 2.0)(draft 6))

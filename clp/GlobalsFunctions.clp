@@ -92,19 +92,19 @@
             "}"))
             ;;",\"heightReference\":\"RELATIVE_TO_GROUND\"}"))
 
-(deffunction boat-view3d-model (?mod)
-  (bind ?gltf (nth$ 2 ?mod))
-  (bind ?scale (nth$ 3 ?mod))
-  (bind ?extra (nth$ 5 ?mod))
+(deffunction boat-view3d-model (?model)
+  (bind ?gltf (fact-slot-value ?model gltf))
+  (bind ?scale (fact-slot-value ?model scale))
+  (bind ?extra (fact-slot-value ?model extra))
   (str-cat "{\"gltf\":\"" ?gltf "\""
             ",\"scale\":" ?scale
             ?extra
             ;;"}"))
-            ;;",\"heightReference\":\"CLAMP_TO_GROUND\"}"))
-            ",\"heightReference\":\"RELATIVE_TO_GROUND\"}"))
+            ;;",\"heightReference\":\"RELATIVE_TO_GROUND\"}"))
+            ",\"heightReference\":\"CLAMP_TO_GROUND\"}"))
             
-(deffunction boat-view3d-altitude (?mod)
-  (bind ?draft (nth$ 4 ?mod))
+(deffunction boat-view3d-altitude (?model)
+  (bind ?draft (fact-slot-value ?model draft))
   (if (eq ?draft nil)
 	then
 	(bind ?draft 0))
@@ -147,7 +147,7 @@
 	(str-cat (sub-string 1 (- (str-length ?geojson) 1) ?geojson) "]}"))
 
 (deffunction add-boats-to-view3d-packet (?pv3 ?start ?time ?finish)
-   (do-for-all-facts ((?b Boat)) TRUE
+   (do-for-all-facts ((?b Boat)(?m Model)) (eq ?b:model ?m)
 		(bind ?lat (nth$ 1 ?b:motion))
 		(bind ?lon (nth$ 2 ?b:motion))
 		(bind ?crs (nth$ 3 ?b:motion))
@@ -155,7 +155,7 @@
 		(bind ?ang (deg-rad ?crs))
 		(bind ?lat2 (fut-lat ?lat ?spd ?time ?ang))
 		(bind ?lon2 (fut-lon ?lon ?spd ?time ?ang ?lat))
-        (bind ?pv3 (str-cat ?pv3 "," (boat-view3d ?b:name ?start ?finish ?lat ?lon ?lat2 ?lon2 ?b:model))))
+        (bind ?pv3 (str-cat ?pv3 "," (boat-view3d ?b:name ?start ?finish ?lat ?lon ?lat2 ?lon2 ?m))))
 	?pv3)
 	
 (deffunction create-fleet-czml ()
@@ -197,10 +197,10 @@
 	(bind ?onb-model "")
 	(do-for-fact ((?b Boat)) ?b:onboard
 		(bind ?onb-model (str-cat "[\"" ?b:name
-			                        "\",\"" (nth$ 1 ?b:model)
-			                        "\",\"" (nth$ 2 ?b:model)
-			                        "\",\"" (nth$ 3 ?b:model)
-			                        "\",\"" (nth$ 4 ?b:model) "\"]")))
+			                        "\",\"" (fact-slot-value ?b:model type)
+			                        "\",\"" (fact-slot-value ?b:model gltf)
+			                        "\",\"" (fact-slot-value ?b:model scale)
+			                        "\",\"" (fact-slot-value ?b:model draft) "\"]")))
 	;; united json
 	(str-cat "[{\"boats\":" ?bs ",\"models\":" ?ms ",\"onb_model\":" ?onb-model "}]"))
 
