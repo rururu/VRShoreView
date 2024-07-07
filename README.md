@@ -6,7 +6,7 @@ This progect uses [A Tool for Building Expert Systems CLIPS](https://www.clipsru
 [3D geospatial visualization for the web CesiumJS](https://cesium.com/platform/cesiumjs/) and
 [VR Dashboard plugin](https://chrome.google.com/webstore/search/VR%20Dashboard)
 
-[![Watch the video](VR.png)](https://youtu.be/SP4-xvm6yMo)
+[![Watch the video](VR.png)](https://youtu.be/awl1PMZ9uHk)
 Click the screenshot to see a video!
 
 ## Prerequisites
