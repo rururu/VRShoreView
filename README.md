@@ -26,8 +26,9 @@ Download VRShoreView project from the Github using an OS command "git clone http
 
 1. Open "Virual Regatta" page in a browser.
 2. Activate "VR Dashboard" plugin.
-3. Allow a file VRShoreView.sh (VRShoreView.bat for Windows) to be executable (if needed).
-4. Start VRShoreView program:
+3. Enter into the race.
+4. Allow a file VRShoreView.sh (VRShoreView.bat for Windows) to be executable (if needed).
+5. Start VRShoreView program:
 
 ```shell
 $ cd <..>/VRShoreView
