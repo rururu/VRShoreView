@@ -1,6 +1,5 @@
 (BoatModel (boat "FRIGATE") (model "Frigate" "models/frigate/scene.gltf" 2.0 6 ""))
 (BoatModel (boat "FRIGATE") (model "Bermuda" "models/sailboat/1368Sailboat.gltf" 2.0 2 ""))
-(GEN-MODEL "Bermuda")
 (BoatModel (boat "russor") (model "Santa_Isadora" "models/santa_isadora/scene.gltf" 2.0 60 ""))
 (BoatModel (boat "GAMEURO 974-EZ THESE") (model "Bermuda" "models/sailboat/1368Sailboat.gltf" 2.0 60 ""))
 (BoatModel (boat "TIPAPACHERI BSP") (model "Bermuda" "models/sailboat/1368Sailboat.gltf" 2.0 60 ""))
@@ -49,3 +48,4 @@
 (BoatModel (boat "BONANZA59") (model "Bermuda" "models/sailboat/1368Sailboat.gltf" 2.0 60 ""))
 (BoatModel (boat "URKETA") (model "Bermuda" "models/sailboat/1368Sailboat.gltf" 2.0 60 ""))
 (BoatModel (boat "EOLE 44 LMT") (model "Bermuda" "models/sailboat/1368Sailboat.gltf" 2.0 60 ""))
+(GEN-MODEL "Santa_Isadora")

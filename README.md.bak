@@ -32,8 +32,8 @@ Download VRShoreView project from the Github using an OS command "git clone http
 
 ```shell
 $ cd <..>/VRShoreView
-$ ./run_VRShoreView.sh russor Bermuda       # Linux, MacOS
-$ run_VRShoreView.bat russor Bermuda        # Windows
+$ ./VRShoreView.sh russor Bermuda       # Linux, MacOS
+$ VRShoreView.bat russor Bermuda        # Windows
 ```
 #### Notes:
 
