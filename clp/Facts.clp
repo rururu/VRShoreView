@@ -1,6 +1,6 @@
 
 (deffacts Start-facts
 	(MYBOAT "russor")
-	(NEW-MODEL "Santa_Maria")
+	(NEW-MODEL "Bermuda")
 	(clock 0)
     (timestamp ""))

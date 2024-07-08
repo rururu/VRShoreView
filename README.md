@@ -48,7 +48,9 @@ $ pip install pyais
 $ pip install pynmea2
 ...
 ```
+## Video Lesson
 
+[VR Shore View](https://www.youtube.com/watch?v=zzVgCQel6h8)
 
 _More detailed version: [https://github.com/rururu/sail-pro](https://github.com/rururu/sail-pro)_
 

@@ -100,8 +100,8 @@
             ",\"scale\":" ?scale
             ?extra
             ;;"}"))
-            ;;",\"heightReference\":\"RELATIVE_TO_GROUND\"}"))
-            ",\"heightReference\":\"CLAMP_TO_GROUND\"}"))
+            ;;",\"heightReference\":\"CLAMP_TO_GROUND\"}"))
+            ",\"heightReference\":\"RELATIVE_TO_GROUND\"}"))
             
 (deffunction boat-view3d-altitude (?model)
   (bind ?draft (fact-slot-value ?model draft))

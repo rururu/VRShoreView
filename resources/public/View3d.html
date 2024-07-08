@@ -45,8 +45,8 @@
 			<input type="text" id="mod-draft" name="mod-draft">
 			<label for="mod-draft">draft</label>
         </div>
-		<!-- <div id="models-dls">new model</div>
-        <div id="mod-adjust"></div> -->
+		<!-- <div id="models-dls">new model</div> -->
+        <div id="mod-adjust"></div>
       </div>
     </div>
     <script type="text/javascript" src="CesiumGUISupport.js"></script>
@@ -210,16 +210,17 @@
 		}
 		
 		function model_adjust() {
-			mod_type = document.getElementById("mod-type").value;
+			//mod_type = document.getElementById("mod-type").value;
 			draft = document.getElementById("mod-draft").value;
 			scale = document.getElementById("mod-scale").value;
-			sendCommand ('update-model', "\""+mod_type+"\" "+scale+" "+draft);
+			sendCommand ('update-model', scale+" "+draft);
+			//sendCommand ('update-model', "\""+mod_type+"\" "+scale+" "+draft);
 		}	
 	
 		addToolbarMenu(boat_ops, "boats-dls", "boats");
-		addToolbarMenu(model_ops, "models-dls", "models");
+		//addToolbarMenu(model_ops, "models-dls", "models");
 		//let item = document.getElementById("boats");
-		addToolbarButton("Update Model", model_adjust, "mod-adjust", "adjust")
+		addToolbarButton("Adjust Model", model_adjust, "mod-adjust", "adjust")
     </script>
   </body>
 </html>
