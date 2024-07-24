@@ -46,8 +46,8 @@
 			<label for="mod-draft">draft</label>
         </div>
 		<!-- <div id="models-dls">new model</div> -->
-        <div id="mod-adjust"></div>
-      </div>
+		<div id="mod-adjust"></div>
+        <div id="pause-butt" class="nowrap">Pause</div>
     </div>
     <script type="text/javascript" src="CesiumGUISupport.js"></script>
     <script type="module">
@@ -215,12 +215,22 @@
 			scale = document.getElementById("mod-scale").value;
 			sendCommand ('update-model', scale+" "+draft);
 			//sendCommand ('update-model', "\""+mod_type+"\" "+scale+" "+draft);
+		}
+		
+		function pause_plus() {
+			sendCommand ('pause', 'plus');
+		}	
+	
+		function pause_minus() {
+			sendCommand ('pause', 'minus');
 		}	
 	
 		addToolbarMenu(boat_ops, "boats-dls", "boats");
 		//addToolbarMenu(model_ops, "models-dls", "models");
 		//let item = document.getElementById("boats");
 		addToolbarButton("Adjust Model", model_adjust, "mod-adjust", "adjust")
+		addToolbarButton("+", pause_plus, "pause-butt", "plus")
+		addToolbarButton("-", pause_minus, "pause-butt", "minus")
     </script>
   </body>
 </html>

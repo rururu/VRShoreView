@@ -5,7 +5,6 @@
 (defrule Load-commands
 	(declare (salience -1))
 	(clock ?t)
-	(test (= (mod ?t 2) 0))
 	=>
 	(load-facts "../resources/public/view3d/command.fct"))
 	 
@@ -30,7 +29,27 @@
 	(clear-file "../resources/public/view3d/command.fct")
 	(retract ?cmd))
 
-  
+(defrule Pause-update
+	?cmd <- (Command pause ?val)
+	=>
+	(println "Command: Pause " ?val)
+	(if (eq ?val plus)
+		then
+		(if (< ?*pause* 5)
+			then (bind ?*pause* (+ ?*pause* 1))
+			else (if (= ?*pause* 5)
+			then (bind ?*pause* 10)
+			else (bind ?*pause* (+ ?*pause* 10))))
+		else 
+		(if (> ?*pause* 10)
+		then (bind ?*pause* (- ?*pause* 10))
+		else (if (= ?*pause* 10)
+		then (bind ?*pause* 5)
+		else (if (and (<= ?*pause* 5)(> ?*pause* 1))
+		then (bind ?*pause* (- ?*pause* 1))))))
+	(println "Pause " ?*pause*)	
+	(clear-file "../resources/public/view3d/command.fct")
+	(retract ?cmd))
 
 
 
